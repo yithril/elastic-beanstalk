@@ -1,9 +1,10 @@
 package com.example.recipe_api.controllers;
 
-import com.example.recipe_api.models.Recipe;
+import com.example.recipe_api.models.dto.CreateIngredientDTO;
 import com.example.recipe_api.models.dto.CreateRecipeDTO;
 import com.example.recipe_api.models.dto.RecipeDTO;
 import com.example.recipe_api.models.dto.UpdateRecipeDTO;
+import com.example.recipe_api.services.IngredientService;
 import com.example.recipe_api.services.RecipeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ import java.util.List;
 @RequestMapping("/api/Recipe")
 public class RecipeController {
     private RecipeService recipeService;
+    private final IngredientService ingredientService;
 
     @Autowired
-    public RecipeController(RecipeService recipeService){
+    public RecipeController(RecipeService recipeService, IngredientService ingredientService){
         this.recipeService = recipeService;
+        this.ingredientService = ingredientService;
     }
 
     @GetMapping
@@ -53,5 +56,13 @@ public class RecipeController {
         var recipe = recipeService.updateRecipe(dto, id);
 
         return new ResponseEntity<>(recipe, HttpStatus.OK);
+    }
+
+    @PostMapping("/{recipeId}/ingredients")
+    public ResponseEntity<RecipeDTO> addIngredientToRecipe(@PathVariable Long recipeId,
+                                                           @Valid @RequestBody CreateIngredientDTO createIngredientDTO) {
+        ingredientService.createIngredientForRecipe(recipeId, createIngredientDTO);
+        var updatedRecipeDTO = recipeService.getRecipeById(recipeId);
+        return new ResponseEntity<>(updatedRecipeDTO, HttpStatus.CREATED);
     }
 }

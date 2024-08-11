@@ -3,14 +3,14 @@ package com.example.recipe_api.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-@EntityListeners(AuditingEntityListener.class)
+
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Entity
-public class Recipe {
+public class Recipe extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,11 +27,9 @@ public class Recipe {
     private boolean isNutFree;
     private boolean isGlutenFree;
 
-    @CreatedDate
-    private LocalDateTime createdDate;
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Ingredient> ingredients = new ArrayList<>();
 
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
 
     public Recipe(){
 
@@ -103,19 +101,11 @@ public class Recipe {
         isGlutenFree = glutenFree;
     }
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
+    public List<Ingredient> getIngredients() {
+        return ingredients;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LocalDateTime getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
     }
 }

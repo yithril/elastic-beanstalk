@@ -1,7 +1,11 @@
 package com.example.recipe_api.models.dto;
 
+import com.example.recipe_api.models.Ingredient;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecipeDTO {
     private Long id;
@@ -14,6 +18,8 @@ public class RecipeDTO {
     private boolean isVegan;
     private boolean isNutFree;
     private boolean isGlutenFree;
+
+    private List<IngredientDTO> ingredients = new ArrayList<>();
 
     public RecipeDTO(){
 
@@ -83,5 +89,13 @@ public class RecipeDTO {
 
     public void setGlutenFree(boolean glutenFree) {
         isGlutenFree = glutenFree;
+    }
+
+    public List<IngredientDTO> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<IngredientDTO> ingredients) {
+        this.ingredients = ingredients;
     }
 }
