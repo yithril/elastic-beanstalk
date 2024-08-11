@@ -4,6 +4,10 @@ env:
   variables:
     ENVIRONMENT: "prod"
     SPRING_PROFILES_ACTIVE: "prod"
+    S3_BUCKET: "cvent-beanstalk-bucket"
+    BEANSTALK_APP_NAME: "RecipeAPI"
+    BEANSTALK_ENV_NAME: "RecipeAPI-env"
+    VERSION_LABEL: "v1"
 
 phases:
   install:
@@ -32,7 +36,12 @@ phases:
       - echo Build completed on `date`
       - echo Preparing the artifact for deployment...
       - mv target/*.jar application.jar
-      - echo $CODEBUILD_BUILD_ARN
+      - echo Uploading the artifact to S3...
+      - aws s3 cp application.jar s3://$S3_BUCKET/application.jar
+      - echo Creating a new application version in Elastic Beanstalk...
+      - aws elasticbeanstalk create-application-version --application-name $BEANSTALK_APP_NAME --version-label $VERSION_LABEL --source-bundle S3Bucket=$S3_BUCKET,S3Key=application.jar
+      - echo Updating Elastic Beanstalk environment...
+      - aws elasticbeanstalk update-environment --environment-name $BEANSTALK_ENV_NAME --version-label $VERSION_LABEL
 
 artifacts:
   files:
