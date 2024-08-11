@@ -7,7 +7,6 @@ env:
     S3_BUCKET: "cvent-beanstalk-bucket"
     BEANSTALK_APP_NAME: "RecipeAPI"
     BEANSTALK_ENV_NAME: "RecipeAPI-env"
-    VERSION_LABEL: "v1"
 
 phases:
   install:
@@ -34,12 +33,13 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Preparing the artifact for deployment...
-      - mv target/*.jar application.jar
+      - echo Generating unique version label...
+      - VERSION_LABEL="v$(date +%Y%m%d%H%M%S)"
+      - echo Version label is $VERSION_LABEL
       - echo Uploading the artifact to S3...
-      - aws s3 cp application.jar s3://$S3_BUCKET/application.jar
+      - aws s3 cp target/*.jar s3://$S3_BUCKET/application-$VERSION_LABEL.jar
       - echo Creating a new application version in Elastic Beanstalk...
-      - aws elasticbeanstalk create-application-version --application-name $BEANSTALK_APP_NAME --version-label $VERSION_LABEL --source-bundle S3Bucket=$S3_BUCKET,S3Key=application.jar
+      - aws elasticbeanstalk create-application-version --application-name $BEANSTALK_APP_NAME --version-label $VERSION_LABEL --source-bundle S3Bucket=$S3_BUCKET,S3Key=application-$VERSION_LABEL.jar
       - echo Updating Elastic Beanstalk environment...
       - aws elasticbeanstalk update-environment --environment-name $BEANSTALK_ENV_NAME --version-label $VERSION_LABEL
 
